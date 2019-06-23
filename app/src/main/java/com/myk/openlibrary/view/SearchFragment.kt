@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import com.myk.openlibrary.R
-import com.myk.openlibrary.network.BooksDataSource
+import com.myk.openlibrary.repository.BookRepository
 import com.myk.openlibrary.viewModel.SearchViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -20,7 +20,7 @@ class SearchFragment : Fragment() {
 
     // Lazy inject ViewModel
     private val viewModel by viewModel<SearchViewModel>()
-    private val dataSource by inject<BooksDataSource>()
+    private val repository by inject<BookRepository>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,9 +32,14 @@ class SearchFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         // TODO: Use the ViewModel
-    }
 
-    companion object {
-        fun newInstance() = SearchFragment()
+        // observe live data
+        repository.searchResults.observe(this, Observer {
+            Timber.d("Something is happening: ${it.size}")
+        })
+
+        GlobalScope.launch(Dispatchers.Main) {
+            repository.searchLibrary("the lord of the rings", 1)
+        }
     }
 }

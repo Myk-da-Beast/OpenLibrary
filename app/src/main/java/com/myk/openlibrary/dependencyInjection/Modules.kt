@@ -1,5 +1,7 @@
 package com.myk.openlibrary.dependencyInjection
 
+import com.myk.openlibrary.database.Database
+import com.myk.openlibrary.database.DatabaseImpl
 import com.myk.openlibrary.network.*
 import com.myk.openlibrary.repository.BookRepository
 import com.myk.openlibrary.repository.BookRepositoryImpl
@@ -14,10 +16,11 @@ val appModule = module {
     // singleton dependencies
     single(createOnStart = true) { OpenLibraryApiService() }
     single<BooksDataSource>(createOnStart = true) { BooksDataSourceImpl(get()) }
+    single<Database>(createOnStart = true) { DatabaseImpl() }
 
     // instanced dependencies
     factory<ConnectivityInterceptor> { ConnectivityInterceptorImpl(androidContext()) }
-    factory<BookRepository> { BookRepositoryImpl(get()) }
+    factory<BookRepository> { BookRepositoryImpl(get(), get()) }
 }
 
 // MARK: view model modules

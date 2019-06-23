@@ -2,25 +2,41 @@ package com.myk.openlibrary.model
 
 
 import com.google.gson.annotations.SerializedName
+import io.realm.RealmObject
 
 // class to represent simple book results from OpenLibrary
 // TODO: decide whether to use this class or Doc
-data class Book(
-    @SerializedName("author_key")
-    val authorKey: List<String>,
-    @SerializedName("author_name")
-    val authorName: List<String>,
+open class Book(
+//    @SerializedName("author_key")
+//    var authorKey: List<String>,
+//    @SerializedName("author_name")
+//    var authorName: List<String>,
     @SerializedName("cover_i")
-    val coverI: Int,
+    var coverI: Int,
     @SerializedName("edition_count")
-    val editionCount: Int,
+    var editionCount: Int,
     @SerializedName("first_publish_year")
-    val firstPublishYear: Int,
+    var firstPublishYear: Int,
     @SerializedName("has_fulltext")
-    val hasFulltext: Boolean,
-    val ia: List<String>,
-    val key: String,
+    var hasFulltext: Boolean,
+//    var ia: List<String>,
+    var key: String,
     @SerializedName("public_scan_b")
-    val publicScanB: Boolean,
-    val title: String
-)
+    var publicScanB: Boolean,
+    var title: String
+) : RealmObject() {
+
+    // default constructor for realm
+    constructor() : this(
+//        listOf(),
+//        listOf(),
+        -1,
+        -1,
+        -1,
+        false,
+//        listOf(),
+        "",
+        false,
+        ""
+    )
+}

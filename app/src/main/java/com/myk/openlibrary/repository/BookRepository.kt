@@ -4,13 +4,15 @@ import androidx.annotation.IntRange
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.myk.openlibrary.NoInternetException
-import com.myk.openlibrary.model.OpenLibraryResponse
+import com.myk.openlibrary.database.Database
+import com.myk.openlibrary.model.Book
 import com.myk.openlibrary.model.Doc
 import com.myk.openlibrary.network.OpenLibraryApiService
+import io.realm.RealmResults
 import timber.log.Timber
 
 interface BookRepository {
-    val searchResults: LiveData<OpenLibraryResponse>
+    val searchResults: LiveData<RealmResults<Book>>
     val wishList: LiveData<Doc>
 
     /**
@@ -26,21 +28,23 @@ interface BookRepository {
 }
 
 class BookRepositoryImpl(
-    private val openLibraryApi: OpenLibraryApiService
+    private val openLibraryApi: OpenLibraryApiService,
+    private val database: Database
 ): BookRepository {
 
-    override val searchResults: LiveData<OpenLibraryResponse>
+    override val searchResults: LiveData<RealmResults<Book>>
         get() = _searchResults
     override val wishList: LiveData<Doc>
         get() = _wishList
 
-    private val _searchResults = MutableLiveData<OpenLibraryResponse>()
+    private val _searchResults = database.observeBooks()
     private val _wishList = MutableLiveData<Doc>()
 
     override suspend fun searchLibrary(searchString: String, @IntRange(from = 1) page: Int) {
         try {
+            // query results from internet and cache them
             openLibraryApi.searchForBookAsync(searchString, page).await().let {
-                _searchResults.postValue(it)
+                database.cacheBooks(it.docs)
             }
         } catch (error: NoInternetException) {
             Timber.e("No/low internet connectivity: $error")

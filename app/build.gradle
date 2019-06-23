@@ -1,12 +1,16 @@
 apply plugin: 'com.android.application'
-
 apply plugin: 'kotlin-android'
-
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'realm-android'
 
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.0"
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
     defaultConfig {
         applicationId "com.myk.openlibrary"
         minSdkVersion 15
@@ -42,7 +46,7 @@ dependencies {
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
 
     // Koin dependency Injection
-    compile 'org.koin:koin-android:1.0.2'
+    implementation 'org.koin:koin-android:1.0.2'
     implementation 'org.koin:koin-androidx-viewmodel:1.0.2'
 
     // Serialization/Deserialization
