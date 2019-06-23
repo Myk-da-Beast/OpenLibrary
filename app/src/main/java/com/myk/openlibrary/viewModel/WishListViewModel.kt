@@ -1,4 +1,4 @@
-package com.myk.openlibrary.wishList
+package com.myk.openlibrary.viewModel
 
 import androidx.lifecycle.ViewModel
 

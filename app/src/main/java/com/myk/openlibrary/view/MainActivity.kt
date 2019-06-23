@@ -1,15 +1,11 @@
-package com.myk.openlibrary
+package com.myk.openlibrary.view
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
-import com.myk.openlibrary.search.SearchFragment
-import com.myk.openlibrary.wishList.WishListFragment
+import com.myk.openlibrary.R
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {

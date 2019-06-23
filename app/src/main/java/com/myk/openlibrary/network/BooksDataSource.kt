@@ -4,11 +4,11 @@ import androidx.annotation.IntRange
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.myk.openlibrary.NoInternetException
-import com.myk.openlibrary.data.BooksResponse
+import com.myk.openlibrary.model.OpenLibraryResponse
 import timber.log.Timber
 
 interface BooksDataSource {
-    val queriedBooks: LiveData<BooksResponse>
+    val queriedBooks: LiveData<OpenLibraryResponse>
 
     /**
      * Queries books from the OpenLibrary.org
@@ -20,11 +20,11 @@ interface BooksDataSource {
     suspend fun queryBooks(query: String, page: Int)
 }
 
-class BooksDataSourceImpl(private val openLibraryApi: OpenLibraryApi) : BooksDataSource {
+class BooksDataSourceImpl(private val openLibraryApi: OpenLibraryApiService) : BooksDataSource {
 
-    override val queriedBooks: LiveData<BooksResponse>
+    override val queriedBooks: LiveData<OpenLibraryResponse>
         get() = _queriedBooks
-    private val _queriedBooks = MutableLiveData<BooksResponse>()
+    private val _queriedBooks = MutableLiveData<OpenLibraryResponse>()
 
     override suspend fun queryBooks(query: String, @IntRange(from = 1) page: Int) {
         try {

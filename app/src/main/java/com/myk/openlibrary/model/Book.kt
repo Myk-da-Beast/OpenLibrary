@@ -1,4 +1,4 @@
-package com.myk.openlibrary.data
+package com.myk.openlibrary.model
 
 
 import com.google.gson.annotations.SerializedName

@@ -1,4 +1,4 @@
-package com.myk.openlibrary.wishList
+package com.myk.openlibrary.view
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -7,11 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import com.myk.openlibrary.R
+import com.myk.openlibrary.viewModel.WishListViewModel
 
 class WishListFragment : Fragment() {
 
     // Lazy inject ViewModel
-    private val viewModel: WishListViewModel by viewModel()
+    private val viewModel by viewModel<WishListViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
