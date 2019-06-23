@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
+import com.myk.openlibrary.search.SearchFragment
+import com.myk.openlibrary.wishList.WishListFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -20,27 +22,13 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-class Tab1 : Fragment() {
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_search, container, false)
-}
-
-class Tab2 : Fragment() {
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? = inflater.inflate(R.layout.fragment_wishlist, container, false)
-}
-
 class Adapter(
     fragmentManager: FragmentManager
 ) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+
     override fun getPageTitle(position: Int): CharSequence? = if (position == 0) "Search" else "Wishlist"
-    override fun getItem(position: Int): Fragment = if (position == 0) Tab1() else Tab2()
+
+    override fun getItem(position: Int): Fragment = if (position == 0) SearchFragment() else WishListFragment()
 
     override fun getCount(): Int = 2
 }
