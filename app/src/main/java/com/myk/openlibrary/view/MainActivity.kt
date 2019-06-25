@@ -15,16 +15,17 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         tabs.setupWithViewPager(pager)
         pager.adapter = Adapter(supportFragmentManager)
+        setSupportActionBar(toolbar)
     }
-}
 
-class Adapter(
-    fragmentManager: FragmentManager
-) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+    class Adapter(
+        fragmentManager: FragmentManager
+    ) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
-    override fun getPageTitle(position: Int): CharSequence? = if (position == 0) "Search" else "Wishlist"
+        override fun getPageTitle(position: Int): CharSequence? = if (position == 0) "Search" else "Wishlist"
 
-    override fun getItem(position: Int): Fragment = if (position == 0) SearchFragment() else WishListFragment()
+        override fun getItem(position: Int): Fragment = if (position == 0) SearchFragment() else WishListFragment()
 
-    override fun getCount(): Int = 2
+        override fun getCount(): Int = 2
+    }
 }

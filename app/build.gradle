@@ -25,9 +25,13 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    dataBinding {
+        enabled = true
+    }
 }
 ext.coroutines_version = '1.1.1'
 ext.retrofit_version = '2.4.0'
+ext.glide_version = '4.9.0'
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
@@ -41,6 +45,9 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.0.0'
 
+    // Realm Recycler Adapter
+    implementation "io.realm:android-adapters:3.1.0"
+
     // Coroutines
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
@@ -48,6 +55,11 @@ dependencies {
     // Koin dependency Injection
     implementation 'org.koin:koin-android:1.0.2'
     implementation 'org.koin:koin-androidx-viewmodel:1.0.2'
+
+    // Glide web-image loading/caching
+    implementation "com.github.bumptech.glide:glide:$glide_version"
+    annotationProcessor "com.github.bumptech.glide:compiler:$glide_version"
+    kapt "com.github.bumptech.glide:compiler:$glide_version"
 
     // Serialization/Deserialization
     api 'com.google.code.gson:gson:2.8.5'

@@ -1,4 +1,4 @@
-package com.myk.openlibrary.dependencyInjection
+package com.myk.openlibrary
 
 import com.myk.openlibrary.database.Database
 import com.myk.openlibrary.database.DatabaseImpl
@@ -15,7 +15,6 @@ val appModule = module {
 
     // singleton dependencies
     single(createOnStart = true) { OpenLibraryApiService() }
-    single<BooksDataSource>(createOnStart = true) { BooksDataSourceImpl(get()) }
     single<Database>(createOnStart = true) { DatabaseImpl() }
 
     // instanced dependencies
@@ -26,7 +25,7 @@ val appModule = module {
 // MARK: view model modules
 
 val searchModule = module {
-    viewModel { SearchViewModel() }
+    viewModel { SearchViewModel(get()) }
 }
 
 val wishListModule = module {
@@ -34,4 +33,8 @@ val wishListModule = module {
 }
 
 // all modules to include
-val modules = listOf(appModule, searchModule, wishListModule)
+val modules = listOf(
+    appModule,
+    searchModule,
+    wishListModule
+)

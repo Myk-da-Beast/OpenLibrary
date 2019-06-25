@@ -39,4 +39,10 @@ open class Book(
         false,
         ""
     )
+
+    val coverUrl: String
+        get() {
+            val id = if (coverI >= 0) coverI else return ""
+            return "https://covers.openlibrary.org/w/id/$id-S.jpg"
+        }
 }

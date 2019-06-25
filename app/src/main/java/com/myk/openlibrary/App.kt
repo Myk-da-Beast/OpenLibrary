@@ -1,7 +1,6 @@
 package com.myk.openlibrary
 
 import android.app.Application
-import com.myk.openlibrary.dependencyInjection.modules
 import io.realm.Realm
 import org.koin.android.ext.android.startKoin
 import org.koin.android.logger.AndroidLogger
