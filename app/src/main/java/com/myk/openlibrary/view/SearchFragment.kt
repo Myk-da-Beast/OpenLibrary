@@ -1,9 +1,11 @@
 package com.myk.openlibrary.view
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityOptionsCompat
+import androidx.core.util.Pair
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,8 +20,9 @@ import kotlinx.android.synthetic.main.search_fragment.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 import com.myk.openlibrary.R
-import com.myk.openlibrary.launchActivity
-import com.myk.openlibrary.view.DetailsActivity.Companion.EXTRA_TRANSITION_NAME
+import com.myk.openlibrary.view.DetailsActivity.Companion.EXTRA_BOOK_ID
+import com.myk.openlibrary.view.DetailsActivity.Companion.EXTRA_IMAGE_TRANSITION_NAME
+import com.myk.openlibrary.view.DetailsActivity.Companion.EXTRA_TEXT_TRANSITION_NAME
 import io.realm.Case
 import java.util.*
 import kotlin.concurrent.schedule
@@ -47,19 +50,21 @@ class SearchFragment : BaseFragment(), SearchView.OnQueryTextListener {
         adapter = SearchAdapter(realm.where(Book::class.java).findAll())
         recycler.adapter = adapter
         adapter?.apply {
-            onItemClickListener = { _, book, view ->
+            onItemClickListener = { _, book, imageView, textView ->
                 Timber.d("Clicked book: ${book.title}")
 
-                val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                    requireActivity(),
-                    view,
-                    ViewCompat.getTransitionName(view) ?: ""
-                )
-
-                launchActivity<DetailsActivity> {
-                    putInt(DetailsActivity.EXTRA_BOOK_ID, book.coverI)
-                    putString(EXTRA_TRANSITION_NAME, "${book.coverI}-title")
-                    options.toBundle()
+                activity?.let {
+                    ActivityOptionsCompat.makeSceneTransitionAnimation(it)
+                    val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                        it,
+                        Pair(imageView, ViewCompat.getTransitionName(imageView) ?: "0"),
+                        Pair(textView, ViewCompat.getTransitionName(textView) ?: "1")
+                    )
+                    val intent = Intent(activity, DetailsActivity::class.java)
+                    intent.putExtra(EXTRA_BOOK_ID, book.coverI)
+                    intent.putExtra(EXTRA_IMAGE_TRANSITION_NAME, ViewCompat.getTransitionName(imageView))
+                    intent.putExtra(EXTRA_TEXT_TRANSITION_NAME, ViewCompat.getTransitionName(textView))
+                    startActivity(intent, options.toBundle())
                 }
             }
         }
@@ -110,7 +115,7 @@ class SearchAdapter(
 
     // npasses the adapter position, book object that was clicked, and view(s)
     // that will be shared in the scene transtion
-    var onItemClickListener: ((Int, Book, View) -> Unit)? = null
+    var onItemClickListener: ((Int, Book, View, View) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -119,7 +124,7 @@ class SearchAdapter(
         holder.itemView.setOnClickListener {
             val item = getItem(holder.adapterPosition)
             item ?: return@setOnClickListener
-            onItemClickListener?.invoke(holder.adapterPosition, item, holder.textView)
+            onItemClickListener?.invoke(holder.adapterPosition, item, holder.imageView, holder.textView)
         }
         return holder
     }
@@ -128,6 +133,7 @@ class SearchAdapter(
         getItem(position)?.let {
             holder.bind(it)
             // transition names must be unique
+            ViewCompat.setTransitionName(holder.imageView, "${it.coverI}-image")
             ViewCompat.setTransitionName(holder.textView, "${it.coverI}-title")
         }
     }
@@ -136,6 +142,7 @@ class SearchAdapter(
         private val binding: SearchItemBinding
     ) : RecyclerView.ViewHolder(binding.root) {
         val textView = binding.titleTextView
+        val imageView = binding.image
 
         fun bind(book: Book) {
             binding.title = book.title

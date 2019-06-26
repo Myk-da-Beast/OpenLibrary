@@ -18,12 +18,11 @@
             android:id="@+id/image"
             android:layout_width="192dp"
             android:layout_height="256dp"
-            app:imageUrl="@{viewModel.book.coverUrlLarge}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/title"
+            android:id="@+id/title_text_view"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textSize="20sp"
