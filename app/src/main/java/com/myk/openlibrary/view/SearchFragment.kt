@@ -6,6 +6,7 @@ import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.myk.openlibrary.databinding.SearchItemBinding
 import com.myk.openlibrary.model.Book
 import com.myk.openlibrary.view.base.BaseFragment
@@ -19,7 +20,6 @@ import timber.log.Timber
 import com.myk.openlibrary.R
 import com.myk.openlibrary.launchActivity
 import com.myk.openlibrary.view.DetailsActivity.Companion.EXTRA_TRANSITION_NAME
-import com.myk.openlibrary.view.base.BaseRealmRecyclerAdapter
 import io.realm.Case
 import java.util.*
 import kotlin.concurrent.schedule
@@ -134,7 +134,7 @@ class SearchAdapter(
 
     class ViewHolder(
         private val binding: SearchItemBinding
-    ) : BaseRealmRecyclerAdapter.ViewHolder(binding.root) {
+    ) : RecyclerView.ViewHolder(binding.root) {
         val textView = binding.titleTextView
 
         fun bind(book: Book) {
