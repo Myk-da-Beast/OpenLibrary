@@ -5,6 +5,7 @@ import com.myk.openlibrary.database.DatabaseImpl
 import com.myk.openlibrary.network.*
 import com.myk.openlibrary.repository.BookRepository
 import com.myk.openlibrary.repository.BookRepositoryImpl
+import com.myk.openlibrary.viewModel.BookViewModel
 import com.myk.openlibrary.viewModel.SearchViewModel
 import com.myk.openlibrary.viewModel.WishListViewModel
 import org.koin.android.ext.koin.androidContext
@@ -19,6 +20,7 @@ val appModule = module {
 
     // instanced dependencies
     factory<ConnectivityInterceptor> { ConnectivityInterceptorImpl(androidContext()) }
+    factory<ExceptionInterceptor> { ExceptionInterceptorImpl() }
     factory<BookRepository> { BookRepositoryImpl(get(), get()) }
 }
 

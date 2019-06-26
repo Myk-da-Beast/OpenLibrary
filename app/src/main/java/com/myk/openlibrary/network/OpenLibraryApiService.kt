@@ -23,11 +23,17 @@ interface OpenLibraryApiService {
     ): Deferred<OpenLibraryResponse>
 
     // the KoinComponent interface allows us to use dependency injection
-    companion object: KoinComponent {
+    companion object : KoinComponent {
         private val connectivityInterceptor: ConnectivityInterceptor by inject()
+        private val exceptionInterceptor: ExceptionInterceptor by inject()
 
         operator fun invoke(): OpenLibraryApiService = Retrofit.Builder()
-            .client(OkHttpClient().newBuilder().addInterceptor(connectivityInterceptor).build())
+            .client(
+                OkHttpClient().newBuilder()
+                    .addInterceptor(connectivityInterceptor)
+                    .addInterceptor(exceptionInterceptor)
+                    .build()
+            )
             .baseUrl("https://openlibrary.org/")
             .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .addConverterFactory(GsonConverterFactory.create())

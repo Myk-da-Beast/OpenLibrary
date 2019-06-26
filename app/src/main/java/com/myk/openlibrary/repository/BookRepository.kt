@@ -8,8 +8,8 @@ import com.myk.openlibrary.database.Database
 import com.myk.openlibrary.model.Book
 import com.myk.openlibrary.model.Doc
 import com.myk.openlibrary.network.OpenLibraryApiService
-import io.realm.RealmResults
 import timber.log.Timber
+import java.io.IOException
 
 interface BookRepository {
     val searchResults: LiveData<RealmResults<Book>>
@@ -40,7 +40,7 @@ class BookRepositoryImpl(
     private val _searchResults = database.observeBooks()
     private val _wishList = MutableLiveData<Doc>()
 
-    override suspend fun searchLibrary(searchString: String, @IntRange(from = 1) page: Int) {
+    override suspend fun searchLibrary(searchString: String, page: Int) {
         try {
             // query results from internet and cache them
             openLibraryApi.searchForBookAsync(searchString, page).await().let {
@@ -48,6 +48,10 @@ class BookRepositoryImpl(
             }
         } catch (error: NoInternetException) {
             Timber.e("No/low internet connectivity: $error")
+            //TODO present error
+        } catch (error: IOException) {
+            Timber.e("Error: $error")
+            //TODO present error
         }
     }
 
