@@ -30,6 +30,10 @@ val searchModule = module {
     viewModel { SearchViewModel(get()) }
 }
 
+val detailsModule = module {
+    viewModel { BookViewModel(get()) }
+}
+
 val wishListModule = module {
     viewModel { WishListViewModel() }
 }
@@ -38,5 +42,6 @@ val wishListModule = module {
 val modules = listOf(
     appModule,
     searchModule,
+    detailsModule,
     wishListModule
 )

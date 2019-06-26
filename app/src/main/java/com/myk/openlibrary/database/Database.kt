@@ -2,9 +2,7 @@ package com.myk.openlibrary.database
 
 import androidx.lifecycle.LiveData
 import com.myk.openlibrary.model.Book
-import io.realm.Realm
-import io.realm.RealmConfiguration
-import io.realm.RealmResults
+import io.realm.*
 import timber.log.Timber
 
 interface Database {
@@ -15,6 +13,14 @@ interface Database {
     suspend fun cacheBooks(books: List<Book>)
 
     /**
+     * Queries for a book by id. Checks in memory first before
+     * querying persisted memory.
+     *
+     * @return the queried book object or null
+     */
+    suspend fun getBook(id: Int) : Book?
+
+    /**
      * Queries for books from the database, and then listen for changes on the data
      */
     fun observeBooks(): LiveData<RealmResults<Book>>
@@ -22,7 +28,7 @@ interface Database {
 
 class DatabaseImpl: Database {
 
-    private val persistedRealm = RealmConfiguration.Builder()
+    private val persistedRealmConfiguration = RealmConfiguration.Builder()
         .name("persisted-realm.realm")
         .deleteRealmIfMigrationNeeded()
         .build()
@@ -45,14 +51,36 @@ class DatabaseImpl: Database {
     override suspend fun cacheBooks(books: List<Book>) {
         Timber.v("Caching ${books.size} books")
         safeExecute {
-            it.copyToRealmOrUpdate(books)
+                it.copyToRealmOrUpdate(books)
         }
+    }
+
+    override suspend fun getBook(id: Int): Book? {
+        Timber.v("Querying book with id: $id")
+
+        val inMemoryRealm = Realm.getDefaultInstance()
+        val inMemoryQuery = inMemoryRealm.where(Book::class.java).equalTo("coverI", id)
+
+        val persistedRealm = Realm.getInstance(persistedRealmConfiguration)
+        val persistedQuery = persistedRealm.where(Book::class.java).equalTo("coverI", id)
+
+        return safeFindFirst(inMemoryRealm, inMemoryQuery) ?: safeFindFirst(persistedRealm, persistedQuery)
     }
 
     // takes a transaction and handles the realm instance while performing that transaction
     private fun safeExecute(inMemory: Boolean = true, transaction: (Realm) -> Unit) {
-        val realm = if (inMemory) Realm.getDefaultInstance() else Realm.getInstance(persistedRealm)
+        val realm = if (inMemory) Realm.getDefaultInstance() else Realm.getInstance(persistedRealmConfiguration)
         realm.executeTransaction(transaction)
         realm.close()
+    }
+
+    // queries an object and handles realm management
+    private fun <T : RealmObject> safeFindFirst(realm: Realm, query: RealmQuery<T>): T? {
+        val managedResult = query.findFirst() ?: return null
+
+        // since we are closing realm anyway there is no reason to use a managed object here
+        val unmanagedResult = realm.copyFromRealm(managedResult)
+        realm.close()
+        return unmanagedResult
     }
 }
