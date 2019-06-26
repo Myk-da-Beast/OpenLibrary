@@ -8,6 +8,7 @@ import com.myk.openlibrary.database.Database
 import com.myk.openlibrary.model.Book
 import com.myk.openlibrary.model.Doc
 import com.myk.openlibrary.network.OpenLibraryApiService
+import io.realm.RealmQuery
 import timber.log.Timber
 import java.io.IOException
 
@@ -26,7 +27,9 @@ interface BookRepository {
 
     suspend fun getBook(id: Int): Book?
 
-    suspend fun loadWishlist()
+    suspend fun cacheBook(book: Book)
+
+    fun getWishListQuery(): RealmQuery<Book>
 }
 
 class BookRepositoryImpl(
@@ -46,7 +49,7 @@ class BookRepositoryImpl(
         try {
             // query results from internet and cache them
             openLibraryApi.searchForBookAsync(searchString, page).await().let {
-                database.cacheBooks(it.docs)
+                database.cacheBooks(it.docs, true)
             }
         } catch (error: NoInternetException) {
             Timber.e("No/low internet connectivity: $error")
@@ -59,7 +62,15 @@ class BookRepositoryImpl(
 
     override suspend fun getBook(id: Int): Book? = database.getBook(id)
 
-    override suspend fun loadWishlist() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override suspend fun cacheBook(book: Book) {
+        database.cacheBooks(listOf(book), true)
+
+        // we want to persist wishlisted items so that they will be available across
+        // app sessions
+        if (book.isOnWishList) {
+            database.cacheBooks(listOf(book), false)
+        }
     }
+
+    override fun getWishListQuery(): RealmQuery<Book> = database.getWishListQuery()
 }

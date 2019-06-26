@@ -14,6 +14,7 @@ class BookViewModel(
 
     val book: LiveData<Book>
         get() = _book
+
     private var _book = MutableLiveData<Book>()
 
     fun setBook(id: Int) {

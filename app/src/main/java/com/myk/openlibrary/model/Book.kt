@@ -27,6 +27,7 @@ open class Book(
     var publicScanB: Boolean,
     var title: String
 ) : RealmObject() {
+    var isOnWishList = false
 
     // default constructor for realm
     constructor() : this(

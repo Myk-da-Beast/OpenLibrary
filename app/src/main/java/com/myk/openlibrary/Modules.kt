@@ -35,7 +35,7 @@ val detailsModule = module {
 }
 
 val wishListModule = module {
-    viewModel { WishListViewModel() }
+    viewModel { WishListViewModel(get()) }
 }
 
 // all modules to include

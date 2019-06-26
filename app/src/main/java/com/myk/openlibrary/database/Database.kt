@@ -10,7 +10,7 @@ interface Database {
     /**
      * Store Book objects in the database
      */
-    suspend fun cacheBooks(books: List<Book>)
+    suspend fun cacheBooks(books: List<Book>, inMemory: Boolean)
 
     /**
      * Queries for a book by id. Checks in memory first before
@@ -24,6 +24,12 @@ interface Database {
      * Queries for books from the database, and then listen for changes on the data
      */
     fun observeBooks(): LiveData<RealmResults<Book>>
+
+    /**
+     * Returns a query for wish list items. A query object allows us to listen
+     * for changes.
+     */
+    fun getWishListQuery(): RealmQuery<Book>
 }
 
 class DatabaseImpl: Database {
@@ -48,9 +54,9 @@ class DatabaseImpl: Database {
     override fun observeBooks(): LiveData<RealmResults<Book>> =
         Realm.getDefaultInstance().where(Book::class.java).findAll().asLiveData()
 
-    override suspend fun cacheBooks(books: List<Book>) {
+    override suspend fun cacheBooks(books: List<Book>, inMemory: Boolean) {
         Timber.v("Caching ${books.size} books")
-        safeExecute {
+        safeExecute(inMemory) {
                 it.copyToRealmOrUpdate(books)
         }
     }
@@ -66,6 +72,9 @@ class DatabaseImpl: Database {
 
         return safeFindFirst(inMemoryRealm, inMemoryQuery) ?: safeFindFirst(persistedRealm, persistedQuery)
     }
+
+    override fun getWishListQuery(): RealmQuery<Book> =
+        Realm.getInstance(persistedRealmConfiguration).where(Book::class.java).equalTo("isOnWishList", true)
 
     // takes a transaction and handles the realm instance while performing that transaction
     private fun safeExecute(inMemory: Boolean = true, transaction: (Realm) -> Unit) {

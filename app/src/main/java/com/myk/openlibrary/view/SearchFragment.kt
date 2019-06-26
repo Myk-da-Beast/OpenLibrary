@@ -8,14 +8,10 @@ import androidx.core.app.ActivityOptionsCompat
 import androidx.core.util.Pair
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.myk.openlibrary.databinding.SearchItemBinding
 import com.myk.openlibrary.model.Book
 import com.myk.openlibrary.view.base.BaseFragment
 import com.myk.openlibrary.viewModel.SearchViewModel
-import io.realm.OrderedRealmCollection
 import io.realm.Realm
-import io.realm.RealmRecyclerViewAdapter
 import kotlinx.android.synthetic.main.search_fragment.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
@@ -23,6 +19,7 @@ import com.myk.openlibrary.R
 import com.myk.openlibrary.view.DetailsActivity.Companion.EXTRA_BOOK_ID
 import com.myk.openlibrary.view.DetailsActivity.Companion.EXTRA_IMAGE_TRANSITION_NAME
 import com.myk.openlibrary.view.DetailsActivity.Companion.EXTRA_TEXT_TRANSITION_NAME
+import com.myk.openlibrary.view.base.BookAdapter
 import io.realm.Case
 import java.util.*
 import kotlin.concurrent.schedule
@@ -31,9 +28,10 @@ import kotlin.concurrent.schedule
 class SearchFragment : BaseFragment(), SearchView.OnQueryTextListener {
     // Lazy inject ViewModel
     private val viewModel by viewModel<SearchViewModel>()
-    private var adapter: SearchAdapter? = null
+    private var adapter: BookAdapter? = null
     private val realm = Realm.getDefaultInstance()
-    private var queryTimer: Timer? = null
+    private var queryTimer: Timer = Timer()
+    private val queryDelay = 500L // how long (in milliseconds) to wait before querying the API after receiving input
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -47,26 +45,11 @@ class SearchFragment : BaseFragment(), SearchView.OnQueryTextListener {
 
         recycler.layoutManager = LinearLayoutManager(context)
 
-        adapter = SearchAdapter(realm.where(Book::class.java).findAll())
+        adapter = BookAdapter(realm.where(Book::class.java).findAll(), true)
         recycler.adapter = adapter
         adapter?.apply {
-            onItemClickListener = { _, book, imageView, textView ->
-                Timber.d("Clicked book: ${book.title}")
-
-                activity?.let {
-                    ActivityOptionsCompat.makeSceneTransitionAnimation(it)
-                    val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                        it,
-                        Pair(imageView, ViewCompat.getTransitionName(imageView) ?: "0"),
-                        Pair(textView, ViewCompat.getTransitionName(textView) ?: "1")
-                    )
-                    val intent = Intent(activity, DetailsActivity::class.java)
-                    intent.putExtra(EXTRA_BOOK_ID, book.coverI)
-                    intent.putExtra(EXTRA_IMAGE_TRANSITION_NAME, ViewCompat.getTransitionName(imageView))
-                    intent.putExtra(EXTRA_TEXT_TRANSITION_NAME, ViewCompat.getTransitionName(textView))
-                    startActivity(intent, options.toBundle())
-                }
-            }
+            onItemClickListener = ::onBookClicked
+            onWishListClickListener = ::onAddToWishListClicked
         }
     }
 
@@ -97,58 +80,43 @@ class SearchFragment : BaseFragment(), SearchView.OnQueryTextListener {
             }
             // This timer prevents us from querying the api in the middle of the user typing up a search query. This
             // will cut down on unnecessary requests
-            queryTimer?.cancel()
-            queryTimer?.purge()
+            queryTimer.cancel()
+            queryTimer.purge()
             queryTimer = Timer()
-            queryTimer?.schedule(1000L) {
+            queryTimer.schedule(queryDelay) {
                 Timber.d("querying API: $newText")
                 viewModel.updateSearchQuery(newText)
             }
         }
         return true
     }
-}
 
-class SearchAdapter(
-    collection: OrderedRealmCollection<Book>
-) : RealmRecyclerViewAdapter<Book, SearchAdapter.ViewHolder>(collection, true) {
+    private fun onBookClicked(position: Int, book: Book, imageView: View, textView: View) {
+        Timber.d("Clicked book: ${book.title}")
 
-    // npasses the adapter position, book object that was clicked, and view(s)
-    // that will be shared in the scene transtion
-    var onItemClickListener: ((Int, Book, View, View) -> Unit)? = null
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val layoutInflater = LayoutInflater.from(parent.context)
-        val binding = SearchItemBinding.inflate(layoutInflater, parent, false)
-        val holder = ViewHolder(binding)
-        holder.itemView.setOnClickListener {
-            val item = getItem(holder.adapterPosition)
-            item ?: return@setOnClickListener
-            onItemClickListener?.invoke(holder.adapterPosition, item, holder.imageView, holder.textView)
-        }
-        return holder
-    }
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        getItem(position)?.let {
-            holder.bind(it)
-            // transition names must be unique
-            ViewCompat.setTransitionName(holder.imageView, "${it.coverI}-image")
-            ViewCompat.setTransitionName(holder.textView, "${it.coverI}-title")
+        activity?.let {
+            ActivityOptionsCompat.makeSceneTransitionAnimation(it)
+            val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                it,
+                Pair(imageView, ViewCompat.getTransitionName(imageView) ?: "0"),
+                Pair(textView, ViewCompat.getTransitionName(textView) ?: "1")
+            )
+            val intent = Intent(activity, DetailsActivity::class.java)
+            intent.putExtra(EXTRA_BOOK_ID, book.coverI)
+            intent.putExtra(EXTRA_IMAGE_TRANSITION_NAME, ViewCompat.getTransitionName(imageView))
+            intent.putExtra(EXTRA_TEXT_TRANSITION_NAME, ViewCompat.getTransitionName(textView))
+            startActivity(intent, options.toBundle())
         }
     }
 
-    class ViewHolder(
-        private val binding: SearchItemBinding
-    ) : RecyclerView.ViewHolder(binding.root) {
-        val textView = binding.titleTextView
-        val imageView = binding.image
+    private fun onAddToWishListClicked(book: Book, isOnWishList: Boolean) {
+        Timber.d("Clicked wishlist")
 
-        fun bind(book: Book) {
-            binding.title = book.title
-            binding.coverImageUrl = book.coverUrlSmall
-            // need to call this or else recyclerView may load data into the wrong cells
-            binding.executePendingBindings()
-        }
+        // convert to unmanaged realm object so that we can modify it
+        val unmanagedBook = realm.copyFromRealm(book)
+        unmanagedBook.isOnWishList = isOnWishList
+
+        // save changes to the object
+        viewModel.cacheBook(unmanagedBook)
     }
 }
