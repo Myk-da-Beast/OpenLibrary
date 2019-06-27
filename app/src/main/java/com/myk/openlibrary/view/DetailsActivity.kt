@@ -13,10 +13,10 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.myk.openlibrary.R
 import com.myk.openlibrary.databinding.ActivityDetailsBinding
+import com.myk.openlibrary.model.Book
 import com.myk.openlibrary.viewModel.BookViewModel
 import kotlinx.android.synthetic.main.activity_details.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import timber.log.Timber
 
 class DetailsActivity : AppCompatActivity() {
 
@@ -39,8 +39,18 @@ class DetailsActivity : AppCompatActivity() {
         }
         viewModel.setBook(intent.getIntExtra(EXTRA_BOOK_ID, -1))
         viewModel.book.observe(this, Observer {
+            actionBar?.title = it.title
             setImage(it.coverUrlMedium)
+            hideEmptyFields(it)
         })
+
+        toolbar.setNavigationOnClickListener {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                finishAfterTransition()
+            } else {
+                onBackPressed()
+            }
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -79,6 +89,24 @@ class DetailsActivity : AppCompatActivity() {
                 }
             })
             .into(image)
+    }
+
+    // fixme for some reason this breaks the constraints but if it worked it would be able to hide the empty fields
+    private fun hideEmptyFields(book: Book) {
+//        title_label.visibleOrGone = book.title.isNotEmpty()
+//        title_text_view.visibleOrGone = book.title.isNotEmpty()
+//        subtitle_label.visibleOrGone = book.subtitle.isNotEmpty()
+//        subtitle_text_view.visibleOrGone = book.subtitle.isNotEmpty()
+//        author_label.visibleOrGone = book.authorName.isNotEmpty()
+//        author_text_view.visibleOrGone = book.authorName.isNotEmpty()
+//        subject_label.visibleOrGone = book.subjects.isNotEmpty()
+//        subject_text_view.visibleOrGone = book.subjects.isNotEmpty()
+//        publisher_label.visibleOrGone = book.publishers.isNotEmpty()
+//        publisher_text_view.visibleOrGone = book.publishers.isNotEmpty()
+//        publish_date_label.visibleOrGone = book.firstPublishYear >= 0
+//        publish_date_text_view.visibleOrGone = book.firstPublishYear >= 0
+//        preview_label.visibleOrGone = book.preview.isNotEmpty()
+//        preview_text_view.visibleOrGone = book.preview.isNotEmpty()
     }
 
     companion object {

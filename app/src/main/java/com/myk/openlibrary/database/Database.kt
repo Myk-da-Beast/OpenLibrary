@@ -1,6 +1,8 @@
 package com.myk.openlibrary.database
 
+import android.text.TextUtils
 import androidx.lifecycle.LiveData
+import com.myk.openlibrary.listToTruncatedString
 import com.myk.openlibrary.model.Book
 import io.realm.*
 import timber.log.Timber
@@ -18,7 +20,7 @@ interface Database {
      *
      * @return the queried book object or null
      */
-    suspend fun getBook(id: Int) : Book?
+    suspend fun getBook(id: Int): Book?
 
     /**
      * Queries for books from the database, and then listen for changes on the data
@@ -38,7 +40,7 @@ interface Database {
     fun getWishListQuery(): RealmQuery<Book>
 }
 
-class DatabaseImpl: Database {
+class DatabaseImpl : Database {
 
     private val persistedRealmConfiguration = RealmConfiguration.Builder()
         .name("persisted-realm.realm")
@@ -50,11 +52,13 @@ class DatabaseImpl: Database {
 
         // Sets up an in-memory realm as the default. This way we can store information in-memory to increase
         // performance without having to persist everything.
-        Realm.setDefaultConfiguration(RealmConfiguration.Builder()
-            .name("in-memory-realm.realm")
-            .deleteRealmIfMigrationNeeded()
-            .inMemory()
-            .build())
+        Realm.setDefaultConfiguration(
+            RealmConfiguration.Builder()
+                .name("in-memory-realm.realm")
+                .deleteRealmIfMigrationNeeded()
+                .inMemory()
+                .build()
+        )
     }
 
     override fun observeBooks(): LiveData<RealmResults<Book>> =
@@ -62,8 +66,20 @@ class DatabaseImpl: Database {
 
     override suspend fun cacheBooks(books: List<Book>, inMemory: Boolean) {
         Timber.v("Caching ${books.size} books")
-        safeExecute(inMemory) {
-                it.copyToRealmOrUpdate(books)
+        safeExecute(inMemory) { realm ->
+            books.forEach { book ->
+                book.listToTruncatedString(book.authorName)?.let {
+                    book.authors = it
+                }
+                book.listToTruncatedString(book.subject)?.let {
+                    book.subjects = it
+                }
+                book.listToTruncatedString(book.publisher)?.let {
+                    book.publishers = it
+                }
+                book.preview = TextUtils.join(" ", book.firstSentence)
+            }
+            realm.copyToRealmOrUpdate(books)
         }
     }
 

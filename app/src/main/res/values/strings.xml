@@ -4,4 +4,11 @@
     <string name="search_title">Search</string>
     <string name="wish_list_title">Wishlist</string>
     <string name="app_title">Open Library</string>
+    <string name="title_label">Title:</string>
+    <string name="author_label">Author(s):</string>
+    <string name="subtitle_label">Subtitle:</string>
+    <string name="subject_label">Subject(s):</string>
+    <string name="first_published_label">First Published:</string>
+    <string name="preview_label">Preview:</string>
+    <string name="publisher_label">Publisher(s):</string>
 </resources>

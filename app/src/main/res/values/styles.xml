@@ -8,4 +8,12 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="DetailsText">
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="DetailsText.Value" parent="DetailsText">
+        <item name="android:layout_marginLeft">8dp</item>
+    </style>
+
 </resources>

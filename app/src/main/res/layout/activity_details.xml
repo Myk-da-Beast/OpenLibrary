@@ -4,33 +4,196 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="viewModel"
             type="com.myk.openlibrary.viewModel.BookViewModel" />
     </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".view.DetailsActivity">
 
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_scrollFlags="scroll|enterAlways"
+                app:navigationIcon="?homeAsUpIndicator"
+                app:title="@{viewModel.book.title}">
+
+            </androidx.appcompat.widget.Toolbar>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
         <ImageView
             android:id="@+id/image"
             android:layout_width="192dp"
             android:layout_height="256dp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/appbar" />
+
+        <TextView
+            android:id="@+id/title_label"
+            style="@style/DetailsText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/title_label"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/image" />
 
         <TextView
             android:id="@+id/title_text_view"
+            style="@style/DetailsText.Value"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="20sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/image"
-            app:layout_constraintTop_toTopOf="@+id/image"
             android:text="@{viewModel.book.title}"
+            app:layout_constraintBaseline_toBaselineOf="@+id/title_label"
+            app:layout_constraintBottom_toTopOf="@id/subtitle_label"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/title_label"
             tools:text="Book Title" />
 
+        <TextView
+            android:id="@+id/subtitle_label"
+            style="@style/DetailsText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/subtitle_label"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/title_text_view" />
+
+        <TextView
+            android:id="@+id/subtitle_text_view"
+            style="@style/DetailsText.Value"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{viewModel.book.subtitle}"
+            app:layout_constraintBaseline_toBaselineOf="@+id/subtitle_label"
+            app:layout_constraintBottom_toTopOf="@id/author_label"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/subtitle_label"
+            tools:text="Subtitle of a Book" />
+
+        <TextView
+            android:id="@+id/author_label"
+            style="@style/DetailsText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/author_label"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/subtitle_text_view" />
+
+        <TextView
+            android:id="@+id/author_text_view"
+            style="@style/DetailsText.Value"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{viewModel.book.authors}"
+            app:layout_constraintBaseline_toBaselineOf="@+id/author_label"
+            app:layout_constraintBottom_toTopOf="@id/subject_label"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/author_label"
+            tools:text="Author of a Book" />
+
+        <TextView
+            android:id="@+id/subject_label"
+            style="@style/DetailsText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/subject_label"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/author_text_view" />
+
+        <TextView
+            android:id="@+id/subject_text_view"
+            style="@style/DetailsText.Value"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{viewModel.book.subjects}"
+            app:layout_constraintBaseline_toBaselineOf="@+id/subject_label"
+            app:layout_constraintBottom_toTopOf="@id/publisher_label"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/subject_label"
+            tools:text="Subject of a Book" />
+
+        <TextView
+            android:id="@+id/publisher_label"
+            style="@style/DetailsText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/publisher_label"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/subject_text_view" />
+
+        <TextView
+            android:id="@+id/publisher_text_view"
+            style="@style/DetailsText.Value"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{viewModel.book.publishers}"
+            app:layout_constraintBaseline_toBaselineOf="@+id/publisher_label"
+            app:layout_constraintBottom_toTopOf="@id/publish_date_label"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/publisher_label"
+            tools:text="Subject of a Book" />
+
+        <TextView
+            android:id="@+id/publish_date_label"
+            style="@style/DetailsText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/first_published_label"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/publisher_text_view" />
+
+        <TextView
+            android:id="@+id/publish_date_text_view"
+            style="@style/DetailsText.Value"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{viewModel.book.getFirstPublishDate()}"
+            app:layout_constraintBaseline_toBaselineOf="@+id/publish_date_label"
+            app:layout_constraintBottom_toTopOf="@id/preview_label"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/publish_date_label"
+            tools:text="Subject of a Book" />
+
+        <TextView
+            android:id="@+id/preview_label"
+            style="@style/DetailsText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/preview_label"
+            android:visibility="invisible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/publish_date_text_view" />
+
+        <TextView
+            android:id="@+id/preview_text_view"
+            style="@style/DetailsText.Value"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{viewModel.book.preview}"
+            android:visibility="invisible"
+            app:layout_constraintBaseline_toBaselineOf="@+id/preview_label"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/preview_label"
+            tools:text="Subject of a Book" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 </layout>
