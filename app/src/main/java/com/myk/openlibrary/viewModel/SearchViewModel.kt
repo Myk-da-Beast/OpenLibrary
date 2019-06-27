@@ -20,7 +20,10 @@ class SearchViewModel(
 
     val query: LiveData<RealmQuery<Book>>
         get() = _query
+    val isQuerying: LiveData<Boolean>
+        get() = _isQuerying
     private var _query = MutableLiveData<RealmQuery<Book>>()
+    private var _isQuerying = MutableLiveData<Boolean>()
     private var queryTimer: Timer = Timer()
     private val queryDelay = 500L // how long (in milliseconds) to wait before querying the API after receiving input
 
@@ -47,7 +50,9 @@ class SearchViewModel(
             queryTimer = Timer()
             queryTimer.schedule(queryDelay) {
                 Timber.d("querying API: $newQuery")
+                _isQuerying.postValue(true)
                 updateSearchQuery(newQuery)
+                _isQuerying.postValue(false)
             }
         }
         return true

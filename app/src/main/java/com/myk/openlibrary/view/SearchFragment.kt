@@ -53,6 +53,9 @@ class SearchFragment : BaseFragment() {
         viewModel.query.observe(this, Observer {
             adapter?.updateData(it.findAll())
         })
+        viewModel.isQuerying.observe(this, Observer {
+            (activity as MainActivity).showProgress(it)
+        })
     }
 
     private fun onBookClicked(position: Int, book: Book, imageView: View, textView: View) {

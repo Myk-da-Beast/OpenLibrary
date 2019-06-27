@@ -3,4 +3,5 @@
     <string name="search_hint">Search OpenLibrary.org</string>
     <string name="search_title">Search</string>
     <string name="wish_list_title">Wishlist</string>
+    <string name="app_title">Open Library</string>
 </resources>

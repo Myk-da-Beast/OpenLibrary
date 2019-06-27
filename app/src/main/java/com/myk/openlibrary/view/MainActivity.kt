@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import com.myk.openlibrary.R
+import com.myk.openlibrary.visibleOrGone
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -16,6 +17,17 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         tabs.setupWithViewPager(pager)
         pager.adapter = Adapter(supportFragmentManager, this)
+        progress.visibleOrGone = false
+    }
+
+    fun showProgress(show: Boolean) {
+        if (show) {
+            // we don't want to show the progress bar at all if the query is very fast, so we use this animation here
+            // to delay it a bit
+            progress.animate().alpha(1.0f)
+        } else {
+            progress.alpha = 0.0f
+        }
     }
 
     class Adapter(
