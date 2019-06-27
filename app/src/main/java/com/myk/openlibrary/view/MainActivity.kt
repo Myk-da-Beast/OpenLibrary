@@ -21,13 +21,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun showProgress(show: Boolean) {
-        if (show) {
-            // we don't want to show the progress bar at all if the query is very fast, so we use this animation here
-            // to delay it a bit
-            progress.animate().alpha(1.0f)
-        } else {
-            progress.alpha = 0.0f
-        }
+        progress.visibleOrGone = show
     }
 
     class Adapter(

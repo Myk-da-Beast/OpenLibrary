@@ -27,7 +27,7 @@ val appModule = module {
 // MARK: view model modules
 
 val searchModule = module {
-    viewModel { SearchViewModel(get()) }
+    viewModel { SearchViewModel(androidContext(), get()) }
 }
 
 val detailsModule = module {

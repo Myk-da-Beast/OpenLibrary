@@ -1,8 +1,12 @@
 package com.myk.openlibrary.viewModel
 
+import android.content.Context
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.myk.openlibrary.NoInternetException
+import com.myk.openlibrary.R
 import com.myk.openlibrary.model.Book
 import com.myk.openlibrary.repository.BookRepository
 import io.realm.Case
@@ -11,10 +15,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.io.IOException
 import java.util.*
 import kotlin.concurrent.schedule
 
 class SearchViewModel(
+    private val context: Context,
     private val repository: BookRepository
 ) : ViewModel() {
 
@@ -25,7 +31,7 @@ class SearchViewModel(
     private var _query = MutableLiveData<RealmQuery<Book>>()
     private var _isQuerying = MutableLiveData<Boolean>()
     private var queryTimer: Timer = Timer()
-    private val queryDelay = 500L // how long (in milliseconds) to wait before querying the API after receiving input
+    private val queryDelay = 1000L // how long (in milliseconds) to wait before querying the API after receiving input
 
     fun cacheBook(book: Book) {
         // TODO see if this can be refactored
@@ -36,9 +42,11 @@ class SearchViewModel(
 
     fun onQueryTextChange(newQuery: String?): Boolean {
         Timber.v("text changed: $newQuery")
+        _isQuerying.postValue(true)
         if (newQuery.isNullOrEmpty()) {
             // Reset the filter if the query is empty.
             _query.postValue(repository.getAllBooksQuery().sort("title"))
+            _isQuerying.postValue(false)
         } else {
             // apply filter to local data
             _query.postValue(repository.getAllBooksQuery().contains("title", newQuery, Case.INSENSITIVE))
@@ -50,7 +58,6 @@ class SearchViewModel(
             queryTimer = Timer()
             queryTimer.schedule(queryDelay) {
                 Timber.d("querying API: $newQuery")
-                _isQuerying.postValue(true)
                 updateSearchQuery(newQuery)
                 _isQuerying.postValue(false)
             }
@@ -61,7 +68,19 @@ class SearchViewModel(
     private fun updateSearchQuery(query: String) {
         // TODO see if this can be refactored
         GlobalScope.launch(Dispatchers.IO) {
-            repository.searchLibrary(query, 1)
+            try {
+                repository.searchLibrary(query, 1)
+            } catch (error: NoInternetException) {
+                GlobalScope.launch(Dispatchers.Main) {
+                    Toast.makeText(context, context.resources.getText(R.string.error_no_internet), Toast.LENGTH_SHORT)
+                        .show()
+                }
+            } catch (error: IOException) {
+                GlobalScope.launch(Dispatchers.Main) {
+                    Toast.makeText(context, context.resources.getText(R.string.error_unknown), Toast.LENGTH_SHORT)
+                        .show()
+                }
+            }
         }
     }
 }

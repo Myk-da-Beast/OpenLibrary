@@ -55,6 +55,9 @@ class SearchFragment : BaseFragment() {
         })
         viewModel.isQuerying.observe(this, Observer {
             (activity as MainActivity).showProgress(it)
+
+            // removes the keyboard after a query completes
+            if (!it) searchView.clearFocus()
         })
     }
 

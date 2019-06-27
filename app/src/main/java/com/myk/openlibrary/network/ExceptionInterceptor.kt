@@ -14,9 +14,9 @@ class ExceptionInterceptorImpl : ExceptionInterceptor {
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain) : Response {
         val response = chain.proceed(chain.request())
-        if (response.code() >= 400) {
-            throw IOException()
-        }
+
+        if (response.code() >= 400) throw IOException(response.message())
+
         return response
     }
 }

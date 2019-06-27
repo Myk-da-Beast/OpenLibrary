@@ -11,4 +11,6 @@
     <string name="first_published_label">First Published:</string>
     <string name="preview_label">Preview:</string>
     <string name="publisher_label">Publisher(s):</string>
+    <string name="error_no_internet">No/Low internet connectivity</string>
+    <string name="error_unknown">Something went wrong</string>
 </resources>

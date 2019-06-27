@@ -32,19 +32,19 @@ class BookRepositoryImpl(
     private val database: Database
 ): BookRepository {
 
-    override suspend fun searchLibrary(searchString: String, page: Int) {
-        try {
-            // query results from internet and cache them
-            openLibraryApi.searchForBookAsync(searchString, page).await().let {
-                database.cacheBooks(it.docs, true)
-            }
-        } catch (error: NoInternetException) {
-            Timber.e("No/low internet connectivity: $error")
-            //TODO present error
-        } catch (error: IOException) {
-            Timber.e("Error: $error")
-            //TODO present error
+    @Throws(IOException::class)
+    override suspend fun searchLibrary(searchString: String, page: Int) = try {
+        // query results from internet and cache them
+        openLibraryApi.searchForBookAsync(searchString, page).await().let {
+            database.cacheBooks(it.docs, true)
         }
+    } catch (error: NoInternetException) {
+        Timber.e("No/low internet connectivity: $error")
+        throw NoInternetException()
+
+    } catch (error: IOException) {
+        Timber.e("Error: $error")
+        throw IOException()
     }
 
     override suspend fun getBook(id: Int): Book? = database.getBook(id)
