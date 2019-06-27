@@ -1,5 +1,6 @@
 package com.myk.openlibrary.view
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -14,15 +15,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         tabs.setupWithViewPager(pager)
-        pager.adapter = Adapter(supportFragmentManager)
-        setSupportActionBar(toolbar)
+        pager.adapter = Adapter(supportFragmentManager, this)
     }
 
     class Adapter(
-        fragmentManager: FragmentManager
+        fragmentManager: FragmentManager,
+        private val context: Context
     ) : FragmentStatePagerAdapter(fragmentManager, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
-        override fun getPageTitle(position: Int): CharSequence? = if (position == 0) "Search" else "Wishlist"
+        override fun getPageTitle(position: Int): CharSequence? = if (position == 0) context.getString(R.string.search_title) else context.getString(
+                    R.string.wish_list_title)
 
         override fun getItem(position: Int): Fragment = if (position == 0) SearchFragment() else WishListFragment()
 

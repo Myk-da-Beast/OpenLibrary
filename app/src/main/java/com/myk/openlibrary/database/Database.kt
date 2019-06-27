@@ -26,6 +26,12 @@ interface Database {
     fun observeBooks(): LiveData<RealmResults<Book>>
 
     /**
+     * Returns a query for all books from the in-memory realm. A query object allows us to listen
+     * for changes.
+     */
+    fun getAllBooksQuery(): RealmQuery<Book>
+
+    /**
      * Returns a query for wish list items. A query object allows us to listen
      * for changes.
      */
@@ -72,6 +78,8 @@ class DatabaseImpl: Database {
 
         return safeFindFirst(inMemoryRealm, inMemoryQuery) ?: safeFindFirst(persistedRealm, persistedQuery)
     }
+
+    override fun getAllBooksQuery(): RealmQuery<Book> = Realm.getDefaultInstance().where(Book::class.java)
 
     override fun getWishListQuery(): RealmQuery<Book> =
         Realm.getInstance(persistedRealmConfiguration).where(Book::class.java).equalTo("isOnWishList", true)

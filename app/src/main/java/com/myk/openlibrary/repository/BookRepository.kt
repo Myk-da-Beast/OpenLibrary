@@ -29,6 +29,8 @@ interface BookRepository {
 
     suspend fun cacheBook(book: Book)
 
+    fun getAllBooksQuery(): RealmQuery<Book>
+
     fun getWishListQuery(): RealmQuery<Book>
 }
 
@@ -71,6 +73,8 @@ class BookRepositoryImpl(
             database.cacheBooks(listOf(book), false)
         }
     }
+
+    override fun getAllBooksQuery(): RealmQuery<Book> = database.getAllBooksQuery()
 
     override fun getWishListQuery(): RealmQuery<Book> = database.getWishListQuery()
 }

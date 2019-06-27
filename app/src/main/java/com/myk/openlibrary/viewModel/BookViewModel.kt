@@ -18,6 +18,7 @@ class BookViewModel(
     private var _book = MutableLiveData<Book>()
 
     fun setBook(id: Int) {
+        // TODO see if this can be refactored
         GlobalScope.launch {
             _book.postValue(repository.getBook(id))
         }
